@@ -7,10 +7,9 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
+import static org.openqa.selenium.support.ui.ExpectedConditions.textToBePresentInElement;
 import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOf;
 
 /**
@@ -25,6 +24,8 @@ public class WileyHomeWorkTests extends TestBase {
 
 
     //Check the following links are displayed in the top menu
+
+
     Assert.assertTrue(wd.findElement(By.xpath("//a[text()='Resources']")).isDisplayed());
     Assert.assertTrue(wd.findElement(By.xpath("//a[text()='Subjects']")).isDisplayed());
     Assert.assertTrue(wd.findElement(By.xpath("//a[text()='About']")).isDisplayed());
@@ -33,13 +34,14 @@ public class WileyHomeWorkTests extends TestBase {
     //Check items under Resources for sub-header
     wd.findElement(By.xpath("//a[text()='Resources']")).click();
     //There are 10 items under resources sub-header
+
     int k = wd.findElements(By.cssSelector("li.hover div.dropdown-items-wrapper")).size();
     Assert.assertEquals(k, 10);
 
 
     //Check titles
     List<String> titles = new ArrayList<>();
-    List<String> titles2 = new ArrayList<>();
+
     for (int i = 0; i < k; i++) {
       String title = wd.findElements(By.cssSelector("li.hover div.dropdown-items-wrapper")).get(i).getAttribute("innerText");
       titles.add(title.replaceAll("[^A-Za-zА-Яа-я0-9]", ""));
@@ -107,5 +109,43 @@ public class WileyHomeWorkTests extends TestBase {
     //Click Search
     wd.findElement(By.xpath("//button[text()='Search']")).click();
 
+    //Type math
+    wd.findElement(By.id("js-site-search-input")).click();
+    wd.findElement(By.id("js-site-search-input")).clear();
+    wd.findElement(By.id("js-site-search-input")).sendKeys("math");
+
+   //Area with related content is displayed right under the search header
+    WebElement relatedContent = wd.findElement(By.id("ui-id-2"));
+    wait.until(visibilityOf(relatedContent));
+    Assert.assertTrue(relatedContent.isDisplayed());
+
+    //On the left side, it has 4 words starting with “Math”
+    int countWordsOnTheLeft=wd.findElements(By.cssSelector("div.ui-menu-item a")).size();
+    List<String> words = new ArrayList<>();
+    for (int i=0;i<countWordsOnTheLeft;i++){
+      String word=wd.findElements(By.cssSelector("div.ui-menu-item a")).get(i).getAttribute("innerText");
+      words.add(word);
+    }
+    for(String word:words){
+      Assert.assertEquals(word.substring(0,4),"Math");
+    }
+    String test="Math Matters";
+    System.out.println(test.contains("Math"));
+
+
+    //On the right side, there are 4 titles under “Related content” and each title contain “Math” word
+    List<WebElement> relatedContents=wd.findElement(By.className("related-content-products")).findElements(By.className("product-title"));
+
+    Assert.assertEquals(relatedContents.size(),4);
+
+    for(WebElement element:relatedContents){
+      String textOfProduct=element.getAttribute("innerText");
+      Assert.assertTrue(textOfProduct.contains("Math"));
+      System.out.println(textOfProduct);
+    }
+
+
   }
+
+
 }
