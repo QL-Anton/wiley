@@ -1,15 +1,16 @@
-package wiley.test;
+package wiley.test.tests;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import wiley.test.tests.TestBase;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-import static org.openqa.selenium.support.ui.ExpectedConditions.textToBePresentInElement;
 import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOf;
 
 /**
@@ -114,35 +115,60 @@ public class WileyHomeWorkTests extends TestBase {
     wd.findElement(By.id("js-site-search-input")).clear();
     wd.findElement(By.id("js-site-search-input")).sendKeys("math");
 
-   //Area with related content is displayed right under the search header
+    //Area with related content is displayed right under the search header
     WebElement relatedContent = wd.findElement(By.id("ui-id-2"));
     wait.until(visibilityOf(relatedContent));
     Assert.assertTrue(relatedContent.isDisplayed());
 
     //On the left side, it has 4 words starting with “Math”
-    int countWordsOnTheLeft=wd.findElements(By.cssSelector("div.ui-menu-item a")).size();
+    int countWordsOnTheLeft = wd.findElements(By.cssSelector("div.ui-menu-item a")).size();
+    Assert.assertEquals(countWordsOnTheLeft,4);
     List<String> words = new ArrayList<>();
-    for (int i=0;i<countWordsOnTheLeft;i++){
-      String word=wd.findElements(By.cssSelector("div.ui-menu-item a")).get(i).getAttribute("innerText");
+    for (int i = 0; i < countWordsOnTheLeft; i++) {
+      String word = wd.findElements(By.cssSelector("div.ui-menu-item a")).get(i).getAttribute("innerText");
       words.add(word);
     }
-    for(String word:words){
-      Assert.assertEquals(word.substring(0,4),"Math");
+    for (String word : words) {
+      Assert.assertEquals(word.substring(0, 4), "Math");
     }
-    String test="Math Matters";
-    System.out.println(test.contains("Math"));
 
 
     //On the right side, there are 4 titles under “Related content” and each title contain “Math” word
-    List<WebElement> relatedContents=wd.findElement(By.className("related-content-products")).findElements(By.className("product-title"));
+    List<WebElement> relatedContents = wd.findElement(By.className("related-content-products")).findElements(By.className("product-title"));
 
-    Assert.assertEquals(relatedContents.size(),4);
+    Assert.assertEquals(relatedContents.size(), 4);
 
-    for(WebElement element:relatedContents){
-      String textOfProduct=element.getAttribute("innerText");
+    for (WebElement element : relatedContents) {
+      String textOfProduct = element.getAttribute("innerText");
       Assert.assertTrue(textOfProduct.contains("Math"));
-      System.out.println(textOfProduct);
     }
+
+
+    //Click “SEARCH” button
+    wd.findElement(By.xpath("//button[text()='Search']")).click();
+
+
+    List<WebElement> titlesOfContent=wd.findElements(By.cssSelector("h3.product-title"));
+    //Only titles containing “Math” are displayed
+    for(WebElement titleOfContent:titlesOfContent){
+      Assert.assertTrue(titleOfContent.getAttribute("innerText").contains("Math"));
+      Assert.assertTrue(titleOfContent.isDisplayed());
+    }
+    //There are 10 titles
+    Assert.assertEquals(titlesOfContent.size(),10);
+
+
+
+    //Each title has at least one “Add to Cart” button
+    List<WebElement> items=wd.findElements(By.cssSelector("div.product-content"));
+    for (WebElement item:items){
+     WebElement addToCartButton=item.findElement(By.cssSelector("div.SearchResultsList-AddToLegacyCartAction"));
+     Assert.assertTrue(addToCartButton.isDisplayed());
+    }
+
+
+    //Click “SEARCH” button
+    wd.findElement(By.xpath("//button[text()='Search']")).click();
 
 
   }
